@@ -10,9 +10,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Net.WebSockets;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
+using MB_API.Handlers;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -133,9 +136,17 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/images"
 });
 
+
+
 app.UseAuthentication();
 app.UseAuthorization();
+var webSocketOptions = new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromMinutes(2)
+};
 
+app.UseWebSockets(webSocketOptions);
+app.UseMiddleware<WebSocketHandler>();
 app.MapControllers();
 app.SeedData();
 app.Run();

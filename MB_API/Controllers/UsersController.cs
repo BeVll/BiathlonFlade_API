@@ -22,7 +22,7 @@ namespace MB_API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly UserManager<UserEntity> _userManager;
         private readonly IJwtTokenService _jwtTokenService;
@@ -30,7 +30,7 @@ namespace MB_API.Controllers
         private readonly AppEFContext _appEFContext;
         private readonly ICloudStorageService _cloudStorage;
         private readonly IEmailService _emailService;
-        public UserController(UserManager<UserEntity> userManager, IJwtTokenService jwtTokenService, IMapper mapper, AppEFContext appEFContext, ICloudStorageService cloudStorage, IEmailService emailService)
+        public UsersController(UserManager<UserEntity> userManager, IJwtTokenService jwtTokenService, IMapper mapper, AppEFContext appEFContext, ICloudStorageService cloudStorage, IEmailService emailService)
         {
             _userManager = userManager;
             _jwtTokenService = jwtTokenService;

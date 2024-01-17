@@ -15,6 +15,7 @@ namespace MB_API.Data.Entities
         public bool IsFinish { get; set; }
         public int Lap {  get; set; }
         public int? TeamId { get; set; }
+        public int? StageNumber { get; set; }
 
         public virtual EventEntity Race { get; set; }
         public virtual UserEntity Player { get; set; }

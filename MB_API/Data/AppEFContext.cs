@@ -24,6 +24,7 @@ namespace FladeUp_Api.Data
 
         public DbSet<CountryEntity> Countries { get; set; }
         public DbSet<CheckPointEntity> CheckPoints { get; set; }
+        public DbSet<CheckPointType> CheckPointTypes { get; set; }
 
         public DbSet<EventEntity> Events { get; set; }
         public DbSet<EventTypeEnitity> EventTypes { get; set; }

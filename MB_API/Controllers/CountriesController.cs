@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MB_API.Requests.Country;
+using MB_API.Requests.Event;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -14,7 +15,7 @@ namespace FladeUp_API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class CountryController : ControllerBase
+    public class CountriesController : ControllerBase
     {
         private readonly UserManager<UserEntity> _userManager;
         private readonly IJwtTokenService _jwtTokenService;
@@ -22,7 +23,7 @@ namespace FladeUp_API.Controllers
         private readonly AppEFContext _appEFContext;
         private readonly ICloudStorageService _cloudStorage;
 
-        public CountryController(UserManager<UserEntity> userManager, IJwtTokenService jwtTokenService, IMapper mapper, AppEFContext appEFContext, ICloudStorageService cloudStorage)
+        public CountriesController(UserManager<UserEntity> userManager, IJwtTokenService jwtTokenService, IMapper mapper, AppEFContext appEFContext, ICloudStorageService cloudStorage)
         {
             _userManager = userManager;
             _jwtTokenService = jwtTokenService;
@@ -75,7 +76,7 @@ namespace FladeUp_API.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Create([FromForm] CountryCreateRequest model)
+        public async Task<IActionResult> Create([FromForm] CountryCreateUpdateRequest model)
         {
             try
             {
@@ -97,57 +98,59 @@ namespace FladeUp_API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        //[HttpPut("update")]
-        //public async Task<IActionResult> Update([FromForm] RoomUpdateRequest model)
-        //{
-        //    try
-        //    {
-        //        var room = await _appEFContext.Rooms
-        //            .Where(r => r.Id == model.Id)
-        //            .SingleOrDefaultAsync();
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromForm] CountryCreateUpdateRequest value)
+        {
+            try
+            {
+                var country = await _appEFContext.Countries
+                    .Where(r => r.Id == id)
+                    .SingleOrDefaultAsync();
 
-        //        if(room == null)
-        //            return NotFound();
+                if (country == null)
+                    return NotFound();
 
-        //        room.Name = model.Name;
-        //        room.Description = model.Description;
-
-        //        _appEFContext.Update(room);
-        //        await _appEFContext.SaveChangesAsync();
+                country.Name = value.Name;
+                country.Character = value.Character;
 
 
-        //        return Ok(room);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
-
-        //[HttpDelete("delete/{id}")]
-        //public async Task<IActionResult> Delete(int id)
-        //{
-        //    try
-        //    {
-        //        var room = await _appEFContext.Rooms
-        //            .Where(r => r.Id == id)
-        //            .SingleOrDefaultAsync();
-
-        //        if (room == null)
-        //            return NotFound();
-
-        //        _appEFContext.Remove(room);
-        //        await _appEFContext.SaveChangesAsync();
+                _appEFContext.Update(country);
+                await _appEFContext.SaveChangesAsync();
 
 
-        //        return Ok();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
+                return Ok(country);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
       
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                var country = await _appEFContext.Countries
+                    .Where(r => r.Id == id)
+                    .SingleOrDefaultAsync();
+
+                if (country == null)
+                    return NotFound();
+
+                _appEFContext.Remove(country);
+                await _appEFContext.SaveChangesAsync();
+
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
     }
 }
