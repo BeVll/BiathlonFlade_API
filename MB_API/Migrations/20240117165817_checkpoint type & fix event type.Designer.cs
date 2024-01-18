@@ -3,6 +3,7 @@ using System;
 using FladeUp_Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MB_API.Migrations
 {
     [DbContext(typeof(AppEFContext))]
-    partial class AppEFContextModelSnapshot : ModelSnapshot
+    [Migration("20240117165817_checkpoint type & fix event type")]
+    partial class checkpointtypefixeventtype
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,33 +33,15 @@ namespace MB_API.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CheckPointTypeId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Name")
+                    b.Property<string>("CheckPointName")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("TrackId")
+                    b.Property<int>("CheckPointTypeId")
                         .HasColumnType("integer");
 
-                    b.Property<double>("X1")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("X2")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("Y1")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("Y2")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("Z1")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("Z2")
-                        .HasColumnType("double precision");
+                    b.Property<int>("TrackId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 

@@ -6,8 +6,7 @@ using MB_API.Interfaces;
 using MB_API.Requests.Track;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using MB_API.Requests;
-using MB_API.Requests.Event;
+using MB_API.Requests.CheckPoint;
 using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -16,16 +15,15 @@ namespace MB_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EventsController : ControllerBase
+    public class CheckPointsController : ControllerBase
     {
-        // GET: api/<EventController>
         private readonly UserManager<UserEntity> _userManager;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IMapper _mapper;
         private readonly AppEFContext _appEFContext;
         private readonly ICloudStorageService _cloudStorage;
 
-        public EventsController(UserManager<UserEntity> userManager, IJwtTokenService jwtTokenService, IMapper mapper, AppEFContext appEFContext, ICloudStorageService cloudStorage)
+        public CheckPointsController(UserManager<UserEntity> userManager, IJwtTokenService jwtTokenService, IMapper mapper, AppEFContext appEFContext, ICloudStorageService cloudStorage)
         {
             _userManager = userManager;
             _jwtTokenService = jwtTokenService;
@@ -39,17 +37,16 @@ namespace MB_API.Controllers
         {
             try
             {
-                var eventEntity = _appEFContext.Events
+                var checkPoint = _appEFContext.CheckPoints
                     .Where(u => u.Id == id)
-                    .Include(e => e.EventType)
-                    .Include(e => e.Track)
+                    .Include(c => c.CheckPointType)
                     .SingleOrDefault();
 
-                if (eventEntity == null)
+                if (checkPoint == null)
                     return NotFound();
 
 
-                return Ok(eventEntity);
+                return Ok(checkPoint);
 
             }
             catch (Exception ex)
@@ -63,16 +60,15 @@ namespace MB_API.Controllers
         {
             try
             {
-                var events = _appEFContext.Events
-                    .Include(e => e.EventType)
-                    .Include(e => e.Track)
+                var checkPoints = _appEFContext.CheckPoints
+                    .Include(c => c.CheckPointType)
                     .ToList();
 
-                if (events == null)
+                if (checkPoints == null)
                     return NotFound();
 
 
-                return Ok(events);
+                return Ok(checkPoints);
 
             }
             catch (Exception ex)
@@ -82,25 +78,28 @@ namespace MB_API.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Create([FromForm] EventCreateUpdateRequest model)
+        public async Task<IActionResult> Create([FromBody] CheckPointCreateUpdateRequest model)
         {
             try
             {
-                EventEntity eventEntity = new EventEntity()
+                CheckPointEntity checkPoint = new CheckPointEntity()
                 {
-                    EventName = model.EventName,
-                    EventTypeId = model.EventTypeId,
-                    TeamEvent = model.TeamEvent,
+                    Name = model.Name,
+                    CheckPointTypeId = model.CheckPointTypeId,
                     TrackId = model.TrackId,
-                    EventDate = model.EventDate,
+                    X1 = model.X1,
+                    Y1 = model.Y1,
+                    Z1 = model.Z1,
+                    X2 = model.X2,
+                    Y2 = model.Y2,
+                    Z2 = model.Z2,
                 };
 
-                _appEFContext.Add(eventEntity);
-               
+                _appEFContext.Add(checkPoint);
                 await _appEFContext.SaveChangesAsync();
 
 
-                return Ok(eventEntity);
+                return Ok(checkPoint);
 
             }
             catch (Exception ex)
@@ -111,31 +110,33 @@ namespace MB_API.Controllers
 
         // PUT api/<TracksController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromForm] EventCreateUpdateRequest value)
+        public async Task<IActionResult> Put(int id, [FromBody] CheckPointCreateUpdateRequest model)
         {
             try
             {
-                var eventEntity = await _appEFContext.Events
+                var checkPoint = await _appEFContext.CheckPoints
                     .Where(r => r.Id == id)
-                    .Include(e => e.EventType)
-                    .Include(e => e.Track)
+                    .Include(c => c.CheckPointType)
                     .SingleOrDefaultAsync();
 
-                if (eventEntity == null)
+                if (checkPoint == null)
                     return NotFound();
 
-                eventEntity.EventName = value.EventName;
-                eventEntity.EventTypeId = value.EventTypeId;
-                eventEntity.TeamEvent = value.TeamEvent;
-                eventEntity.TrackId = value.TrackId;
-                eventEntity.EventDate = value.EventDate;
+                checkPoint.Name = model.Name;
+                checkPoint.CheckPointTypeId = model.CheckPointTypeId;
+                checkPoint.TrackId = model.TrackId;
+                checkPoint.X1 = model.X1;
+                checkPoint.Y1 = model.Y1;
+                checkPoint.Z1 = model.Z1;
+                checkPoint.X2 = model.X2;
+                checkPoint.Y2 = model.Y2;
+                checkPoint.Z2 = model.Z2;
 
-
-                _appEFContext.Update(eventEntity);
+                _appEFContext.Update(checkPoint);
                 await _appEFContext.SaveChangesAsync();
 
 
-                return Ok(eventEntity);
+                return Ok(checkPoint);
             }
             catch (Exception ex)
             {
@@ -149,14 +150,14 @@ namespace MB_API.Controllers
         {
             try
             {
-                var eventEntity = await _appEFContext.Events
+                var checkPoint = await _appEFContext.CheckPoints
                     .Where(r => r.Id == id)
                     .SingleOrDefaultAsync();
 
-                if (eventEntity == null)
+                if (checkPoint == null)
                     return NotFound();
 
-                _appEFContext.Remove(eventEntity);
+                _appEFContext.Remove(checkPoint);
                 await _appEFContext.SaveChangesAsync();
 
 
