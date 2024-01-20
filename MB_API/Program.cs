@@ -16,6 +16,8 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 using MB_API.Handlers;
+using MB_API.Hubs;
+using Microsoft.AspNetCore.Http.Connections;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -92,22 +94,28 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 builder.Services.AddAutoMapper(typeof(AppMapperProfile));
-
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy",
+        builder => builder
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
+});
+builder.Services.AddSignalR();
+    
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<ICloudStorageService, CloudStorageService>();
 builder.Services.AddSingleton<IEmailService, EmailService>();
-builder.Services.AddCors();
+
 
 var app = builder.Build();
 
-app.UseCors(conf =>
-    conf.AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowAnyOrigin());
+app.UseCors("CorsPolicy");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -115,8 +123,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-
+app.MapHub<ResultsHub>("/resultsHub");
 
 var dir = Path.Combine(Directory.GetCurrentDirectory(), "images");
 if (!Directory.Exists(dir))
@@ -137,15 +144,10 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 
-
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-var webSocketOptions = new WebSocketOptions
-{
-    KeepAliveInterval = TimeSpan.FromMinutes(2)
-};
 
-app.UseWebSockets(webSocketOptions);
 app.UseMiddleware<WebSocketHandler>();
 app.MapControllers();
 app.SeedData();

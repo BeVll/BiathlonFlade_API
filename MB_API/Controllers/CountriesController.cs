@@ -84,6 +84,7 @@ namespace FladeUp_API.Controllers
                 {
                     Name = model.Name,
                     Character = model.Character,
+                    Code = model.Code,
                 };
 
                 _appEFContext.Add(country);
@@ -112,6 +113,7 @@ namespace FladeUp_API.Controllers
 
                 country.Name = value.Name;
                 country.Character = value.Character;
+                country.Code = value.Code;
 
 
                 _appEFContext.Update(country);

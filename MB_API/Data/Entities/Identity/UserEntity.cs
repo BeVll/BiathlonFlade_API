@@ -20,5 +20,7 @@ namespace MB_API.Data.Entities.Identity
         public virtual ICollection<UserRoleEntity> UserRoles { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+
+        public virtual CountryEntity Country {  get; set; } 
     }
 }

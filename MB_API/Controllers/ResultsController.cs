@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MB_API.Requests.Result;
 using System.Security.Claims;
+using MB_API.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -42,7 +44,7 @@ namespace MB_API.Controllers
             try
             {
                 var result = await _appEFContext.Results
-                    .Where(u => u.Id == id)
+                    .Where(r => r.Id == id)
                     .Include(r => r.Player)
                     .Include(r => r.Checkpoint)
                     .Include(r => r.Checkpoint.CheckPointType)
@@ -52,6 +54,7 @@ namespace MB_API.Controllers
                     .Include(r => r.Race.Track.Country)
                     .SingleOrDefaultAsync();
 
+                
                 if (result == null)
                     return NotFound();
 
@@ -66,12 +69,13 @@ namespace MB_API.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] int? id, int? raceId, int? checkpointId, int? playerId, int? checkpointTypeId)
         {
             try
             {
                 var results = await _appEFContext.Results
                     .Include(r => r.Player)
+                    .Include(r => r.Player.Country)
                     .Include(r => r.Checkpoint)
                     .Include(r => r.Checkpoint.CheckPointType)
                     .Include(r => r.Race)
@@ -80,8 +84,30 @@ namespace MB_API.Controllers
                     .Include(r => r.Race.Track.Country)
                     .ToListAsync();
 
+                if (id != null)
+                    results = results.Where(r => r.Id == id).ToList();
+
+                if (raceId != null)
+                {
+                    results = results.Where(r => r.RaceId == raceId).ToList();
+                    results = results.OrderBy(r => r.ResultValue).ToList();
+                }
+                    
+
+                if (checkpointId != null)
+                    results = results.Where(r => r.CheckpointId == checkpointId).ToList();
+
+                if (playerId != null)
+                    results = results.Where(r => r.PlayerId == playerId).ToList();
+
+                if (checkpointTypeId != null)
+                    results = results.Where(r => r.Checkpoint.CheckPointTypeId == checkpointTypeId).ToList();
+
+
                 if (results == null)
                     return NotFound();
+
+                
 
 
                 return Ok(results);
@@ -94,7 +120,7 @@ namespace MB_API.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Create([FromBody] ResultCreateUpdateRequest model)
+        public async Task<IActionResult> Create([FromBody] ResultCreateUpdateRequest model, [FromServices] IHubContext<ResultsHub> hubContext)
         {
             try
             {
@@ -103,7 +129,7 @@ namespace MB_API.Controllers
                 if (player == null)
                     return NotFound();
 
-                ResultEntity result = new ResultEntity()
+                ResultEntity resultEntity = new ResultEntity()
                 {
                     RaceId = model.RaceId,
                     PlayerId = player.Id,
@@ -118,11 +144,28 @@ namespace MB_API.Controllers
                     StageNumber = model.StageNumber,
                 };
 
-                _appEFContext.Add(result);
+                _appEFContext.Add(resultEntity);
                 await _appEFContext.SaveChangesAsync();
 
+               
 
-                return Ok(result);
+                var results = await _appEFContext.Results
+                    .Where(r => r.RaceId == model.RaceId && r.Checkpoint.CheckPointTypeId == 3)
+                    .Include(r => r.Player)
+                    .Include(r => r.Player.Country)
+                    .Include(r => r.Checkpoint)
+                    .Include(r => r.Checkpoint.CheckPointType)
+                    .Include(r => r.Race)
+                    .Include(r => r.Race.EventType)
+                    .Include(r => r.Race.Track)
+                    .Include(r => r.Race.Track.Country)
+                    .ToListAsync();
+                results = results.OrderBy(r => r.ResultValue).ToList();
+
+                await hubContext.Clients.All.SendAsync("ReceiveNewResult", results);
+               
+
+                return Ok(resultEntity);
 
             }
             catch (Exception ex)
