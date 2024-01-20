@@ -11,6 +11,11 @@ namespace MB_API.Hubs
             await Clients.All.SendAsync("ReceiveNewResult", result);
         }
 
+        public async Task SendNewCheckPoints(List<RaceCheckPointEntity> raceCheckPoints)
+        {
+            await Clients.All.SendAsync("ReceiveNewCheckPoint", raceCheckPoints);
+        }
+
         public override async Task OnConnectedAsync()
         {
             await Clients.All.SendAsync("ReceiveMessage", $"{Context.ConnectionId} is joined!");

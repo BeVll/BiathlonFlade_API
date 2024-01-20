@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MB_API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class CheckPointsController : ControllerBase
     {
@@ -107,6 +107,8 @@ namespace MB_API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+
 
         // PUT api/<TracksController>/5
         [HttpPut("{id}")]

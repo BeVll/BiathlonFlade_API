@@ -3,6 +3,7 @@ using System;
 using FladeUp_Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MB_API.Migrations
 {
     [DbContext(typeof(AppEFContext))]
-    partial class AppEFContextModelSnapshot : ModelSnapshot
+    [Migration("20240120183609_delete racecp races results")]
+    partial class deleteracecpracesresults
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -265,72 +268,6 @@ namespace MB_API.Migrations
                     b.ToTable("AspNetUserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("MB_API.Data.Entities.RaceCheckPointEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CheckPointId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Lap")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Number")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RaceId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CheckPointId");
-
-                    b.HasIndex("RaceId");
-
-                    b.ToTable("RaceCheckPoints");
-                });
-
-            modelBuilder.Entity("MB_API.Data.Entities.RaceEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("EventDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("EventName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("EventTypeId")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("TeamEvent")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("TrackId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventTypeId");
-
-                    b.HasIndex("TrackId");
-
-                    b.ToTable("Races");
-                });
-
             modelBuilder.Entity("MB_API.Data.Entities.RaceTypeEnitity", b =>
                 {
                     b.Property<int>("Id")
@@ -346,58 +283,6 @@ namespace MB_API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RaceTypes");
-                });
-
-            modelBuilder.Entity("MB_API.Data.Entities.ResultEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsDNF")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsFinish")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsTeamResult")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("Lap")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("PlayerId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RaceCheckpointId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RaceId")
-                        .HasColumnType("integer");
-
-                    b.Property<long?>("ResultValue")
-                        .HasColumnType("bigint");
-
-                    b.Property<int?>("StageNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("StartNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("TeamId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PlayerId");
-
-                    b.HasIndex("RaceCheckpointId");
-
-                    b.HasIndex("RaceId");
-
-                    b.ToTable("Results");
                 });
 
             modelBuilder.Entity("MB_API.Data.Entities.TrackEntity", b =>
@@ -555,71 +440,6 @@ namespace MB_API.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MB_API.Data.Entities.RaceCheckPointEntity", b =>
-                {
-                    b.HasOne("MB_API.Data.Entities.CheckPointEntity", "CheckPoint")
-                        .WithMany()
-                        .HasForeignKey("CheckPointId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MB_API.Data.Entities.RaceEntity", "Race")
-                        .WithMany()
-                        .HasForeignKey("RaceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CheckPoint");
-
-                    b.Navigation("Race");
-                });
-
-            modelBuilder.Entity("MB_API.Data.Entities.RaceEntity", b =>
-                {
-                    b.HasOne("MB_API.Data.Entities.RaceTypeEnitity", "EventType")
-                        .WithMany()
-                        .HasForeignKey("EventTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MB_API.Data.Entities.TrackEntity", "Track")
-                        .WithMany()
-                        .HasForeignKey("TrackId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EventType");
-
-                    b.Navigation("Track");
-                });
-
-            modelBuilder.Entity("MB_API.Data.Entities.ResultEntity", b =>
-                {
-                    b.HasOne("MB_API.Data.Entities.Identity.UserEntity", "Player")
-                        .WithMany()
-                        .HasForeignKey("PlayerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MB_API.Data.Entities.RaceCheckPointEntity", "RaceCheckpoint")
-                        .WithMany()
-                        .HasForeignKey("RaceCheckpointId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MB_API.Data.Entities.RaceEntity", "Race")
-                        .WithMany()
-                        .HasForeignKey("RaceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Player");
-
-                    b.Navigation("Race");
-
-                    b.Navigation("RaceCheckpoint");
                 });
 
             modelBuilder.Entity("MB_API.Data.Entities.TrackEntity", b =>

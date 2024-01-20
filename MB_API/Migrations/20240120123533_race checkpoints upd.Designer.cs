@@ -3,6 +3,7 @@ using System;
 using FladeUp_Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MB_API.Migrations
 {
     [DbContext(typeof(AppEFContext))]
-    partial class AppEFContextModelSnapshot : ModelSnapshot
+    [Migration("20240120123533_race checkpoints upd")]
+    partial class racecheckpointsupd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -104,6 +107,56 @@ namespace MB_API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Countries");
+                });
+
+            modelBuilder.Entity("MB_API.Data.Entities.EventEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("EventDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EventName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("EventTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("TeamEvent")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("TrackId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventTypeId");
+
+                    b.HasIndex("TrackId");
+
+                    b.ToTable("Events");
+                });
+
+            modelBuilder.Entity("MB_API.Data.Entities.EventTypeEnitity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("EventTypeName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EventTypes");
                 });
 
             modelBuilder.Entity("MB_API.Data.Entities.Identity.RoleEntity", b =>
@@ -298,56 +351,6 @@ namespace MB_API.Migrations
                     b.ToTable("RaceCheckPoints");
                 });
 
-            modelBuilder.Entity("MB_API.Data.Entities.RaceEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("EventDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("EventName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("EventTypeId")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("TeamEvent")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("TrackId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventTypeId");
-
-                    b.HasIndex("TrackId");
-
-                    b.ToTable("Races");
-                });
-
-            modelBuilder.Entity("MB_API.Data.Entities.RaceTypeEnitity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("EventTypeName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("RaceTypes");
-                });
-
             modelBuilder.Entity("MB_API.Data.Entities.ResultEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -355,6 +358,9 @@ namespace MB_API.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CheckpointId")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDNF")
                         .HasColumnType("boolean");
@@ -369,9 +375,6 @@ namespace MB_API.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("PlayerId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RaceCheckpointId")
                         .HasColumnType("integer");
 
                     b.Property<int>("RaceId")
@@ -391,9 +394,9 @@ namespace MB_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PlayerId");
+                    b.HasIndex("CheckpointId");
 
-                    b.HasIndex("RaceCheckpointId");
+                    b.HasIndex("PlayerId");
 
                     b.HasIndex("RaceId");
 
@@ -529,6 +532,25 @@ namespace MB_API.Migrations
                     b.Navigation("CheckPointType");
                 });
 
+            modelBuilder.Entity("MB_API.Data.Entities.EventEntity", b =>
+                {
+                    b.HasOne("MB_API.Data.Entities.EventTypeEnitity", "EventType")
+                        .WithMany()
+                        .HasForeignKey("EventTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MB_API.Data.Entities.TrackEntity", "Track")
+                        .WithMany()
+                        .HasForeignKey("TrackId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EventType");
+
+                    b.Navigation("Track");
+                });
+
             modelBuilder.Entity("MB_API.Data.Entities.Identity.UserEntity", b =>
                 {
                     b.HasOne("MB_API.Data.Entities.CountryEntity", "Country")
@@ -565,7 +587,7 @@ namespace MB_API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MB_API.Data.Entities.RaceEntity", "Race")
+                    b.HasOne("MB_API.Data.Entities.EventEntity", "Race")
                         .WithMany()
                         .HasForeignKey("RaceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -576,50 +598,31 @@ namespace MB_API.Migrations
                     b.Navigation("Race");
                 });
 
-            modelBuilder.Entity("MB_API.Data.Entities.RaceEntity", b =>
-                {
-                    b.HasOne("MB_API.Data.Entities.RaceTypeEnitity", "EventType")
-                        .WithMany()
-                        .HasForeignKey("EventTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MB_API.Data.Entities.TrackEntity", "Track")
-                        .WithMany()
-                        .HasForeignKey("TrackId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EventType");
-
-                    b.Navigation("Track");
-                });
-
             modelBuilder.Entity("MB_API.Data.Entities.ResultEntity", b =>
                 {
+                    b.HasOne("MB_API.Data.Entities.CheckPointEntity", "Checkpoint")
+                        .WithMany()
+                        .HasForeignKey("CheckpointId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("MB_API.Data.Entities.Identity.UserEntity", "Player")
                         .WithMany()
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MB_API.Data.Entities.RaceCheckPointEntity", "RaceCheckpoint")
-                        .WithMany()
-                        .HasForeignKey("RaceCheckpointId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MB_API.Data.Entities.RaceEntity", "Race")
+                    b.HasOne("MB_API.Data.Entities.EventEntity", "Race")
                         .WithMany()
                         .HasForeignKey("RaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Checkpoint");
+
                     b.Navigation("Player");
 
                     b.Navigation("Race");
-
-                    b.Navigation("RaceCheckpoint");
                 });
 
             modelBuilder.Entity("MB_API.Data.Entities.TrackEntity", b =>

@@ -9,14 +9,16 @@ using Microsoft.AspNetCore.Mvc;
 using MB_API.Requests;
 using MB_API.Requests.Event;
 using Microsoft.EntityFrameworkCore;
+using MB_API.Requests.CheckPoint;
+using MB_API.Requests.RaceCheckPoint;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace MB_API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
-    public class EventsController : ControllerBase
+    public class RacesController : ControllerBase
     {
         // GET: api/<EventController>
         private readonly UserManager<UserEntity> _userManager;
@@ -25,7 +27,7 @@ namespace MB_API.Controllers
         private readonly AppEFContext _appEFContext;
         private readonly ICloudStorageService _cloudStorage;
 
-        public EventsController(UserManager<UserEntity> userManager, IJwtTokenService jwtTokenService, IMapper mapper, AppEFContext appEFContext, ICloudStorageService cloudStorage)
+        public RacesController(UserManager<UserEntity> userManager, IJwtTokenService jwtTokenService, IMapper mapper, AppEFContext appEFContext, ICloudStorageService cloudStorage)
         {
             _userManager = userManager;
             _jwtTokenService = jwtTokenService;
@@ -39,17 +41,17 @@ namespace MB_API.Controllers
         {
             try
             {
-                var eventEntity = _appEFContext.Events
+                var raceEntity = _appEFContext.Races
                     .Where(u => u.Id == id)
                     .Include(e => e.EventType)
                     .Include(e => e.Track)
                     .SingleOrDefault();
 
-                if (eventEntity == null)
+                if (raceEntity == null)
                     return NotFound();
 
 
-                return Ok(eventEntity);
+                return Ok(raceEntity);
 
             }
             catch (Exception ex)
@@ -63,16 +65,16 @@ namespace MB_API.Controllers
         {
             try
             {
-                var events = _appEFContext.Events
+                var races = _appEFContext.Races
                     .Include(e => e.EventType)
                     .Include(e => e.Track)
                     .ToList();
 
-                if (events == null)
+                if (races == null)
                     return NotFound();
 
 
-                return Ok(events);
+                return Ok(races);
 
             }
             catch (Exception ex)
@@ -82,11 +84,11 @@ namespace MB_API.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Create([FromForm] EventCreateUpdateRequest model)
+        public async Task<IActionResult> Create([FromForm] RaceCreateUpdateRequest model)
         {
             try
             {
-                EventEntity eventEntity = new EventEntity()
+                RaceEntity raceEntity = new RaceEntity()
                 {
                     EventName = model.EventName,
                     EventTypeId = model.EventTypeId,
@@ -95,12 +97,39 @@ namespace MB_API.Controllers
                     EventDate = model.EventDate,
                 };
 
-                _appEFContext.Add(eventEntity);
+                _appEFContext.Add(raceEntity);
                
                 await _appEFContext.SaveChangesAsync();
 
 
-                return Ok(eventEntity);
+                return Ok(raceEntity);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("createCheckPoint")]
+        public async Task<IActionResult> CreateCheckPoint([FromBody] RaceCheckPointCreateRequest model)
+        {
+            try
+            {
+                RaceCheckPointEntity raceCheckPoint = new RaceCheckPointEntity()
+                {
+                    RaceId = model.RaceId,
+                    CheckPointId = model.CheckPointId,
+                    Lap = model.Lap,
+                    Number = model.Number,
+                    Name = model.Name,
+                };
+
+                _appEFContext.Add(raceCheckPoint);
+                await _appEFContext.SaveChangesAsync();
+
+
+                return Ok(raceCheckPoint);
 
             }
             catch (Exception ex)
@@ -111,31 +140,31 @@ namespace MB_API.Controllers
 
         // PUT api/<TracksController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromForm] EventCreateUpdateRequest value)
+        public async Task<IActionResult> Put(int id, [FromForm] RaceCreateUpdateRequest value)
         {
             try
             {
-                var eventEntity = await _appEFContext.Events
+                var raceEntity = await _appEFContext.Races
                     .Where(r => r.Id == id)
                     .Include(e => e.EventType)
                     .Include(e => e.Track)
                     .SingleOrDefaultAsync();
 
-                if (eventEntity == null)
+                if (raceEntity == null)
                     return NotFound();
 
-                eventEntity.EventName = value.EventName;
-                eventEntity.EventTypeId = value.EventTypeId;
-                eventEntity.TeamEvent = value.TeamEvent;
-                eventEntity.TrackId = value.TrackId;
-                eventEntity.EventDate = value.EventDate;
+                raceEntity.EventName = value.EventName;
+                raceEntity.EventTypeId = value.EventTypeId;
+                raceEntity.TeamEvent = value.TeamEvent;
+                raceEntity.TrackId = value.TrackId;
+                raceEntity.EventDate = value.EventDate;
 
 
-                _appEFContext.Update(eventEntity);
+                _appEFContext.Update(raceEntity);
                 await _appEFContext.SaveChangesAsync();
 
 
-                return Ok(eventEntity);
+                return Ok(raceEntity);
             }
             catch (Exception ex)
             {
@@ -149,14 +178,14 @@ namespace MB_API.Controllers
         {
             try
             {
-                var eventEntity = await _appEFContext.Events
+                var raceEntity = await _appEFContext.Races
                     .Where(r => r.Id == id)
                     .SingleOrDefaultAsync();
 
-                if (eventEntity == null)
+                if (raceEntity == null)
                     return NotFound();
 
-                _appEFContext.Remove(eventEntity);
+                _appEFContext.Remove(raceEntity);
                 await _appEFContext.SaveChangesAsync();
 
 

@@ -2,7 +2,7 @@
 
 namespace MB_API.Requests.Event
 {
-    public class EventCreateUpdateRequest
+    public class RaceCreateUpdateRequest
     {
         public string EventName { get; set; }
         public int EventTypeId { get; set; }

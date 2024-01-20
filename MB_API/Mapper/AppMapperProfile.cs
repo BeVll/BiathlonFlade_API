@@ -9,7 +9,7 @@ namespace MB_API.Mapper
     {
         public AppMapperProfile()
         {
-           
+         
         }
        
     }
