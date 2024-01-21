@@ -4,10 +4,11 @@ namespace MB_API.Requests.Event
 {
     public class RaceCreateUpdateRequest
     {
-        public string EventName { get; set; }
-        public int EventTypeId { get; set; }
-        public bool TeamEvent { get; set; }
+        public string RaceName { get; set; }
+        public int RaceTypeId { get; set; }
+        public bool TeamRace { get; set; }
         public int TrackId { get; set; }
-        public DateTime EventDate { get; set; }
+        public int EventId { get; set; }
+        public DateTime RaceDate { get; set; }
     }
 }

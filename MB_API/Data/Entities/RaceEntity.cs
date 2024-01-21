@@ -5,19 +5,23 @@ namespace MB_API.Data.Entities
     public class RaceEntity
     {
         public int Id { get; set; }
-        public string EventName { get; set; } = "";
+        public string RaceName { get; set; } = "";
 
         [ForeignKey("EventType")]
-        public int EventTypeId { get; set; }
+        public int RaceTypeId { get; set; }
 
-        public bool TeamEvent { get; set; }
+        public bool TeamRace { get; set; }
 
         [ForeignKey("Track")]
         public int TrackId { get; set; }
 
-        public DateTime EventDate { get; set; }
+        [ForeignKey("Event")]
+        public int EventId { get; set; }
 
-        public virtual RaceTypeEnitity EventType { get; set; }
+        public DateTime RaceDate { get; set; }
+
+        public virtual RaceTypeEnitity RaceType { get; set; }
         public virtual TrackEntity Track { get; set; }
+        public virtual EventEntity Event { get; set; }
     }
 }

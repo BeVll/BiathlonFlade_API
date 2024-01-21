@@ -52,7 +52,7 @@ namespace MB_API.Controllers
                     .Include(r => r.RaceCheckpoint.CheckPoint)
                     .Include(r => r.RaceCheckpoint.CheckPoint.CheckPointType)
                     .Include(r => r.Race)
-                    .Include(r => r.Race.EventType)
+                    .Include(r => r.Race.RaceType)
                     .Include(r => r.Race.Track)
                     .Include(r => r.Race.Track.Country)
                     .SingleOrDefaultAsync();
@@ -83,7 +83,7 @@ namespace MB_API.Controllers
                     .Include(r => r.RaceCheckpoint.CheckPoint)
                     .Include(r => r.RaceCheckpoint.CheckPoint.CheckPointType)
                     .Include(r => r.Race)
-                    .Include(r => r.Race.EventType)
+                    .Include(r => r.Race.RaceType)
                     .Include(r => r.Race.Track)
                     .Include(r => r.Race.Track.Country)
                     .ToListAsync();
@@ -192,7 +192,7 @@ namespace MB_API.Controllers
                         .Include(r => r.RaceCheckpoint.CheckPoint)
                         .Include(r => r.RaceCheckpoint.CheckPoint.CheckPointType)
                         .Include(r => r.Race)
-                        .Include(r => r.Race.EventType)
+                        .Include(r => r.Race.RaceType)
                         .Include(r => r.Race.Track)
                         .Include(r => r.Race.Track.Country)
                         .ToListAsync();

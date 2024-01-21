@@ -3,6 +3,7 @@ using System;
 using FladeUp_Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MB_API.Migrations
 {
     [DbContext(typeof(AppEFContext))]
-    partial class AppEFContextModelSnapshot : ModelSnapshot
+    [Migration("20240121134433_race eventId and renames")]
+    partial class raceeventIdandrenames
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,9 +148,6 @@ namespace MB_API.Migrations
                     b.Property<int>("CompetitionId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("CountryId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -158,8 +158,6 @@ namespace MB_API.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CompetitionId");
-
-                    b.HasIndex("CountryId");
 
                     b.HasIndex("TrackId");
 
@@ -602,12 +600,6 @@ namespace MB_API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MB_API.Data.Entities.CountryEntity", "Country")
-                        .WithMany()
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("MB_API.Data.Entities.TrackEntity", "Track")
                         .WithMany()
                         .HasForeignKey("TrackId")
@@ -615,8 +607,6 @@ namespace MB_API.Migrations
                         .IsRequired();
 
                     b.Navigation("Competition");
-
-                    b.Navigation("Country");
 
                     b.Navigation("Track");
                 });

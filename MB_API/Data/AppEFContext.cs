@@ -30,6 +30,8 @@ namespace FladeUp_Api.Data
         public DbSet<RaceTypeEnitity> RaceTypes { get; set; }
         public DbSet<ResultEntity> Results { get; set; }
         public DbSet<TrackEntity> Tracks { get; set; }
+        public DbSet<CompetitionEntity> Competitions { get; set; }
+        public DbSet<EventEntity> Events { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

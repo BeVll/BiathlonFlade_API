@@ -3,6 +3,7 @@ using System;
 using FladeUp_Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MB_API.Migrations
 {
     [DbContext(typeof(AppEFContext))]
-    partial class AppEFContextModelSnapshot : ModelSnapshot
+    [Migration("20240121121807_Competitions & Events")]
+    partial class CompetitionsEvents
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,9 +148,6 @@ namespace MB_API.Migrations
                     b.Property<int>("CompetitionId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("CountryId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -158,8 +158,6 @@ namespace MB_API.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CompetitionId");
-
-                    b.HasIndex("CountryId");
 
                     b.HasIndex("TrackId");
 
@@ -366,20 +364,17 @@ namespace MB_API.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("EventId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("RaceDate")
+                    b.Property<DateTime>("EventDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("RaceName")
+                    b.Property<string>("EventName")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("RaceTypeId")
+                    b.Property<int>("EventTypeId")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("TeamRace")
+                    b.Property<bool>("TeamEvent")
                         .HasColumnType("boolean");
 
                     b.Property<int>("TrackId")
@@ -387,9 +382,7 @@ namespace MB_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EventId");
-
-                    b.HasIndex("RaceTypeId");
+                    b.HasIndex("EventTypeId");
 
                     b.HasIndex("TrackId");
 
@@ -602,12 +595,6 @@ namespace MB_API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MB_API.Data.Entities.CountryEntity", "Country")
-                        .WithMany()
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("MB_API.Data.Entities.TrackEntity", "Track")
                         .WithMany()
                         .HasForeignKey("TrackId")
@@ -615,8 +602,6 @@ namespace MB_API.Migrations
                         .IsRequired();
 
                     b.Navigation("Competition");
-
-                    b.Navigation("Country");
 
                     b.Navigation("Track");
                 });
@@ -670,15 +655,9 @@ namespace MB_API.Migrations
 
             modelBuilder.Entity("MB_API.Data.Entities.RaceEntity", b =>
                 {
-                    b.HasOne("MB_API.Data.Entities.EventEntity", "Event")
+                    b.HasOne("MB_API.Data.Entities.RaceTypeEnitity", "EventType")
                         .WithMany()
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MB_API.Data.Entities.RaceTypeEnitity", "RaceType")
-                        .WithMany()
-                        .HasForeignKey("RaceTypeId")
+                        .HasForeignKey("EventTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -688,9 +667,7 @@ namespace MB_API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Event");
-
-                    b.Navigation("RaceType");
+                    b.Navigation("EventType");
 
                     b.Navigation("Track");
                 });

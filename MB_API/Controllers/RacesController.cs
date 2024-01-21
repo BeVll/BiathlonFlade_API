@@ -43,8 +43,9 @@ namespace MB_API.Controllers
             {
                 var raceEntity = _appEFContext.Races
                     .Where(u => u.Id == id)
-                    .Include(e => e.EventType)
+                    .Include(e => e.RaceType)
                     .Include(e => e.Track)
+                    .Include(e => e.Track.Country)
                     .SingleOrDefault();
 
                 if (raceEntity == null)
@@ -66,8 +67,9 @@ namespace MB_API.Controllers
             try
             {
                 var races = _appEFContext.Races
-                    .Include(e => e.EventType)
+                    .Include(e => e.RaceType)
                     .Include(e => e.Track)
+                    .Include(e => e.Track.Country)
                     .ToList();
 
                 if (races == null)
@@ -90,11 +92,12 @@ namespace MB_API.Controllers
             {
                 RaceEntity raceEntity = new RaceEntity()
                 {
-                    EventName = model.EventName,
-                    EventTypeId = model.EventTypeId,
-                    TeamEvent = model.TeamEvent,
+                    RaceName = model.RaceName,
+                    RaceTypeId = model.RaceTypeId,
+                    TeamRace = model.TeamRace,
                     TrackId = model.TrackId,
-                    EventDate = model.EventDate,
+                    RaceDate = model.RaceDate,
+                    EventId = model.EventId,
                 };
 
                 _appEFContext.Add(raceEntity);
@@ -146,19 +149,20 @@ namespace MB_API.Controllers
             {
                 var raceEntity = await _appEFContext.Races
                     .Where(r => r.Id == id)
-                    .Include(e => e.EventType)
+                    .Include(e => e.RaceType)
                     .Include(e => e.Track)
+                    .Include(e => e.Track.Country)
                     .SingleOrDefaultAsync();
 
                 if (raceEntity == null)
                     return NotFound();
 
-                raceEntity.EventName = value.EventName;
-                raceEntity.EventTypeId = value.EventTypeId;
-                raceEntity.TeamEvent = value.TeamEvent;
+                raceEntity.RaceName = value.RaceName;
+                raceEntity.RaceTypeId = value.RaceTypeId;
+                raceEntity.TeamRace = value.TeamRace;
                 raceEntity.TrackId = value.TrackId;
-                raceEntity.EventDate = value.EventDate;
-
+                raceEntity.RaceDate = value.RaceDate;
+                raceEntity.EventId = value.EventId;
 
                 _appEFContext.Update(raceEntity);
                 await _appEFContext.SaveChangesAsync();
